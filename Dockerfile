@@ -1,10 +1,10 @@
-FROM ubuntu:20.04
-ARG UID=0
-ARG USER=root
-ENV DEBIAN_FRONTEND noninteractive
+FROM golang:1.18
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install --no-install-recommends \
+        -y \
         wget \
         make \
         protobuf-compiler \
@@ -13,25 +13,22 @@ RUN apt-get update && \
         git \
         curl
 
-# add a user
-RUN \
-    mkdir -p /work; \
-    if [ "$USER" != "root" ] ; then \
-        useradd -u $UID -m -p `openssl rand -base64 32` -s /bin/bash $USER ; \
-    fi
-
-RUN wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
-
-RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
-
-USER $USER
-RUN echo "PATH=$HOME/go/bin:$PATH:/usr/local/go/bin" >> $HOME/.bashrc
-
-#RUN /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
+# install some stuff that veraison needs
 RUN /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
 RUN /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
 RUN /usr/local/go/bin/go install github.com/mitchellh/protoc-gen-go-json@latest
 RUN /usr/local/go/bin/go install github.com/golang/mock/mockgen@v1.6.0
+RUN /usr/local/go/bin/go install github.com/cweill/gotests/gotests@v1.6.0
+RUN /usr/local/go/bin/go install github.com/fatih/gomodifytags@v1.16.0
+RUN /usr/local/go/bin/go github.com/josharian/impl@v1.1.0
+RUN /usr/local/go/bin/go github.com/haya14busa/goplay/cmd/goplay@v1.0.0
+RUN /usr/local/go/bin/go github.com/go-delve/delve/cmd/dlv@latest
+RUN /usr/local/go/bin/go honnef.co/go/tools/cmd/staticcheck@latest
+RUN /usr/local/go/bin/go github.com/ramya-rao-a/go-outline@v0.0.0-20210608161538-9736a4bde949
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENV DEBIAN_FRONTEND=dialog
+
+
+
+#EXPOSE 8000
+
