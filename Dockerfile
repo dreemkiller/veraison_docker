@@ -7,14 +7,19 @@ RUN apt-get update && \
         -y \
         wget \
         make \
-        protobuf-compiler \
         golang-goprotobuf-dev \
         build-essential \
         git \
-        curl
+        curl \
+	unzip \
+	xxd
+
+RUN curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v21.7/protoc-21.7-linux-aarch_64.zip && \
+	unzip -o protoc-21.7-linux-aarch_64.zip -d /usr/local bin/protoc && \
+	unzip -o protoc-21.7-linux-aarch_64.zip -d /usr/local 'include/*'
 
 # install some stuff that veraison needs
-RUN /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
+RUN /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
 RUN /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
 RUN /usr/local/go/bin/go install github.com/mitchellh/protoc-gen-go-json@latest
 RUN /usr/local/go/bin/go install github.com/golang/mock/mockgen@v1.6.0
@@ -26,6 +31,7 @@ RUN /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest
 RUN /usr/local/go/bin/go install honnef.co/go/tools/cmd/staticcheck@latest
 RUN /usr/local/go/bin/go install github.com/ramya-rao-a/go-outline@v0.0.0-20210608161538-9736a4bde949
 RUN /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
+RUN /usr/local/go/bin/go install github.com/veraison/corim/cocli@latest
 
 ENV DEBIAN_FRONTEND=dialog
 
